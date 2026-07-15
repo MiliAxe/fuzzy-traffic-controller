@@ -94,6 +94,16 @@ class ACOOptimizer:
                         
                         # Clip positions to search bounds
                         ant_positions[a, d] = np.clip(val, self.lb[d], self.ub[d])
+                        
+                if a > 0:
+                    # Enforce sorted coordinates to prevent permutation symmetry and contradictory pheromones
+                    ant_positions[a, 0:3] = np.sort(ant_positions[a, 0:3])
+                    ant_positions[a, 3:6] = np.sort(ant_positions[a, 3:6])
+                    
+                    # Recompute bin choices for the sorted dimensions so pheromones are deposited correctly
+                    for d in range(6):
+                        diffs = np.abs(self.bin_centers[d] - ant_positions[a, d])
+                        ant_bin_choices[a, d] = np.argmin(diffs)
                     
                 # Evaluate the solution constructed by the ant
                 ant_costs[a] = self.cost_func(ant_positions[a])

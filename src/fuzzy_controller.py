@@ -57,6 +57,13 @@ class FuzzyController:
         
         # 3. Rule weights
         self.rule_weights = np.clip(x[6:15], 0.0, 1.0)
+        
+        # 4. Precompute Output Membership Arrays for fast defuzzification
+        self.num_points = 100
+        self.z_vals = np.linspace(self.G_min, self.G_max, self.num_points)
+        self.mu_short_arr = np.array([self._membership_low(z, self.q1, self.q2, self.G_max) for z in self.z_vals])
+        self.mu_med_arr = np.array([self._membership_medium(z, self.q1, self.q2, self.q3) for z in self.z_vals])
+        self.mu_long_arr = np.array([self._membership_high(z, self.q2, self.q3, self.G_max) for z in self.z_vals])
 
     def _membership_low(self, y, p1, p2, max_val):
         """Trapezoidal membership function for Low / Short."""
@@ -141,27 +148,19 @@ class FuzzyController:
             set_activations[i] = np.max(matching) if len(matching) > 0 else 0.0
             
         # Defuzzification: Center of Gravity (Centroid)
-        num_points = 100
-        z_vals = np.linspace(self.G_min, self.G_max, num_points)
-        
-        # Vectorized generation of membership values along z_vals
-        mu_short = np.array([self._membership_low(z, self.q1, self.q2, self.G_max) for z in z_vals])
-        mu_med = np.array([self._membership_medium(z, self.q1, self.q2, self.q3) for z in z_vals])
-        mu_long = np.array([self._membership_high(z, self.q2, self.q3, self.G_max) for z in z_vals])
-        
         # Aggregated fuzzy output membership function: max of min(activation, membership)
-        mu_agg = np.zeros(num_points)
-        for j in range(num_points):
-            mu_agg[j] = max(
-                min(set_activations[0], mu_short[j]),
-                min(set_activations[1], mu_med[j]),
-                min(set_activations[2], mu_long[j])
+        mu_agg = np.maximum(
+            np.minimum(set_activations[0], self.mu_short_arr),
+            np.maximum(
+                np.minimum(set_activations[1], self.mu_med_arr),
+                np.minimum(set_activations[2], self.mu_long_arr)
             )
+        )
             
         # Mathematical Centroid integration (discrete approximation)
         sum_mu = np.sum(mu_agg)
         if sum_mu > 1e-5:
-            centroid = np.sum(z_vals * mu_agg) / sum_mu
+            centroid = np.sum(self.z_vals * mu_agg) / sum_mu
         else:
             # Fallback to center of the output range if no rules fire
             centroid = (self.G_min + self.G_max) / 2.0
