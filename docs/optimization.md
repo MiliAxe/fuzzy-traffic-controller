@@ -26,3 +26,7 @@ Inspired by how ants find the shortest path to food, ACO uses 30 "ants" to build
 During our research, we found a mathematical challenge: the fuzzy parameters have *permutation symmetry* (e.g., swapping the boundaries for "Low" and "Medium" evaluates exactly the same). If left unchecked, this confuses the ants and birds, causing them to deposit contradictory pheromones or collapse their search! 
 
 We fixed this by mathematically forcing all coordinates into a sorted wedge ($x_0 \le x_1 \le x_2$). This simple but powerful fix unlocked incredibly fast, robust, and smooth convergence for both algorithms, completely eliminating premature stagnation.
+
+**Watch the AI learn!** Below is a real-time animation of the PSO swarm over 20 generations. Notice how the particles (blue dots) rapidly confine themselves to the valid sorted region (the red wedge) and beautifully converge on the optimal solution.
+
+![Swarm Convergence](assets/images/swarm_convergence.gif)

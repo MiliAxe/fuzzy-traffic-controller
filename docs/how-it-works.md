@@ -28,6 +28,20 @@ We apply 9 common-sense rules to make a decision. For example:
 ### 3. Defuzzification
 The rules output a "fuzzy" green light recommendation (e.g., "mostly Long, slightly Medium"). We use mathematical integration (the Center of Gravity method) to convert this back into an exact number of seconds (e.g., 42 seconds) to keep the green light on.
 
+## System Architecture Loop
+The controller evaluates the intersection continuously in a tight feedback loop:
+
+```mermaid
+graph TD
+    A[Vehicle Arrivals] --> B[Intersection Queue State]
+    B --> C{Fuzzy Logic Controller}
+    C -->|Fuzzification| D[Calculate Linguistic Terms]
+    D -->|Inference| E[Evaluate 9 Rules]
+    E -->|Defuzzification| F[Output Green Time]
+    F --> G[Traffic Light Execution]
+    G --> B
+```
+
 ## Why Optimization?
 The definitions of "Low", "Medium", and "High" are determined by those geometric boundaries. But what exactly counts as a "High" queue? 10 cars? 20 cars? 
 If we guess these boundaries manually, the system won't be perfect. Instead, we use **AI Optimization Algorithms** to find the absolute mathematically perfect boundaries!

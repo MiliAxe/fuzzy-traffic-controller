@@ -17,6 +17,16 @@ As you can see, both algorithms successfully **slashed average wait times and qu
 
 ## 2. Visual Analysis
 
+### Optimized 3D Control Surface
+The 3D surface below visualizes the "brain" of the AI. It shows exactly how the controller dynamically selects the Green Light duration based on the combinations of Route 1 and Route 2 queue lengths. The smooth, non-linear terrain proves the fuzzy logic effectively handles complex edge-cases!
+
+![3D Control Surface](assets/images/control_surface.gif)
+
+### Queue Length Distribution (Violin Plot)
+While averages are helpful, this violin plot shows the entire *distribution* of queue lengths over the 1200 seconds. Notice how the Baseline model has a long "tail" (meaning massive traffic jams occasionally build up). The PSO and ACO models completely crush this tail, keeping the queue length consistently near zero!
+
+![Queue Violin Plot](assets/images/queue_violin.png)
+
 ### Optimization Convergence Profile
 This chart proves that our algorithms didn't just guess randomly. Over 50 generations, you can see the cost dropping smoothly as the swarms and colonies learned how to manage traffic better. The lack of "flat-lining" proves our permutation symmetry and MMAS fixes were highly successful!
 
