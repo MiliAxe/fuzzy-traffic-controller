@@ -53,4 +53,5 @@ nav:
   - How It Works (Fuzzy Logic): how-it-works.md
   - Optimization Algorithms: optimization.md
   - Performance Results: results.md
+  - Code Flow & Architecture: code-flow.md
   - Code Reference: code-reference.md
