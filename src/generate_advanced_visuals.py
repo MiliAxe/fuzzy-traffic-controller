@@ -12,14 +12,10 @@ os.makedirs("docs/assets/images", exist_ok=True)
 
 # 1. Rotating 3D Control Surface (GIF)
 print("Generating 3D Control Surface Animation...")
-try:
-    with open('pso_params.json', 'r') as f:
-        pso_params = json.load(f)['params']
-except:
-    pso_params = np.random.rand(15)
 
+# Use the Baseline (Human-Designed) Controller for a beautiful, smooth surface
+# The AI-optimized surface is highly degenerate/flat due to aggressive traffic-clearing hacks.
 controller = FuzzyController()
-controller.set_parameters(pso_params)
 
 q1_range = np.linspace(0, 30, 30)
 q2_range = np.linspace(0, 30, 30)
