@@ -131,7 +131,7 @@ class ACOOptimizer:
                     self.tau[d, bin_choice] += deposit
                     
             # MMAS Pheromone Limits: Clip pheromones to keep exploration active and prevent stagnation
-            self.tau = np.clip(self.tau, 1e-2, 100.0)
+            self.tau = np.clip(self.tau, 0.1, 5.0)
             
             if callback:
                 callback(it, self.g_best_cost, self.g_best)
