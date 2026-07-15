@@ -310,6 +310,14 @@ def compare(duration, seed):
         ("ACO Optimized", metrics_aco['history'])
     ]
     
+    # Calculate global maximum queue length across all histories for uniform y-axis scaling
+    global_max_q = max(
+        max(max(metrics_base['history']['q1_len']), max(metrics_base['history']['q2_len'])),
+        max(max(metrics_pso['history']['q1_len']), max(metrics_pso['history']['q2_len'])),
+        max(max(metrics_aco['history']['q1_len']), max(metrics_aco['history']['q2_len']))
+    )
+    y_limit = global_max_q + 2
+    
     for idx, (label, hist) in enumerate(rollouts):
         plt.subplot(3, 1, idx + 1)
         t = hist['time']
@@ -320,27 +328,22 @@ def compare(duration, seed):
         plt.plot(t, q2, label='Queue Route 2', color='#e24a4a', linewidth=1.5)
         
         # Shade background based on active green phase
-        # light_phase: 0: R1 Green, 1: R1 Yellow, 2: R2 Green, 3: R2 Yellow
         light_phase = hist['light_phase']
-        
-        # Draw light phases as vertical color blocks
-        # We can find blocks where R1 is green (0 or 1) vs R2 is green (2 or 3)
-        # For performance, we plot blocks using fill_between
         phase_arr = np.array(light_phase)
         time_arr = np.array(t)
         
         # Where phase is 0 (R1 Green), shade with light blue
         # Where phase is 2 (R2 Green), shade with light red
-        plt.fill_between(time_arr, 0, max(max(q1), max(q2)) + 5, where=(phase_arr == 0),
+        plt.fill_between(time_arr, 0, y_limit + 5, where=(phase_arr == 0),
                          color='#4a90e2', alpha=0.08, label='Route 1 Green Phase')
-        plt.fill_between(time_arr, 0, max(max(q1), max(q2)) + 5, where=(phase_arr == 2),
+        plt.fill_between(time_arr, 0, y_limit + 5, where=(phase_arr == 2),
                          color='#e24a4a', alpha=0.08, label='Route 2 Green Phase')
         
         plt.title(f"{label} - Queue State Rollout", fontsize=11, fontweight='bold')
         plt.xlabel('Simulation Time (seconds)')
         plt.ylabel('Queue Length (vehicles)')
         plt.xlim(0, duration)
-        plt.ylim(0, max(max(q1), max(q2)) + 3)
+        plt.ylim(0, y_limit)
         plt.legend(loc='upper right', frameon=True, facecolor='white', framealpha=0.9, fontsize=9)
         plt.grid(True, linestyle='--', alpha=0.5)
         
