@@ -40,5 +40,17 @@ markdown_extensions:
 extra_javascript:
   - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js
 
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+
 nav:
-  - Technical Overview: index.md
+  - Introduction: index.md
+  - How It Works (Fuzzy Logic): how-it-works.md
+  - Optimization Algorithms: optimization.md
+  - Performance Results: results.md
+  - Code Reference: code-reference.md
