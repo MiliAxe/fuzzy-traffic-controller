@@ -1,43 +1,43 @@
-# Performance Results
+# performance results
 
-We tested our optimized controllers against a baseline manual configuration using a heavy, highly-congested traffic scenario (Seed 4751). The simulation ran for 1200 seconds.
+i ran tests on our optimized controllers compared to a basic manual setup. i used a really heavy, jammed traffic scenario (seed 4751) and let the simulation run for 1200 seconds.
 
-## 1. Comprehensive Performance Matrix
+## 1. the raw numbers
 
-| Metric / Parameter | Baseline (Initial) | PSO Optimized | ACO Optimized | Improvement |
+| metric / parameter | baseline (initial) | pso optimized | aco optimized | improvement |
 | :--- | :--- | :--- | :--- | :--- |
-| **Absolute Min Cost ($C$)** | 7.7490 | 3.9264 | 4.1742 | **~ 50% Better** |
-| **Avg Vehicle Wait Time ($W$)** | 14.22 s | 7.08 s | 7.55 s | **~ 50% Less Wait** |
-| **Avg Queue Length ($Q$)** | 1.55 veh | 0.77 veh | 0.82 veh | **~ 50% Shorter** |
-| **Avg Stops per Vehicle ($S$)** | 86.26% | 75.19% | 74.05% | **~ 14% Fewer** |
+| **lowest cost ($c$)** | 7.7490 | 3.9264 | 4.1742 | **~ 50% better** |
+| **avg wait time ($w$)** | 14.22 s | 7.08 s | 7.55 s | **~ 50% less wait** |
+| **avg queue length ($q$)** | 1.55 veh | 0.77 veh | 0.82 veh | **~ 50% shorter** |
+| **avg stops ($s$)** | 86.26% | 75.19% | 74.05% | **~ 14% fewer** |
 
-As you can see, both algorithms successfully **slashed average wait times and queue lengths in half**!
+as you can see, both algorithms totally crushed it and **cut the average wait times and queue lengths in half**!
 
 ---
 
-## 2. Visual Analysis
+## 2. some cool graphs
 
-### Optimized 3D Control Surface
-The 3D surface below visualizes the "brain" of the AI. It shows exactly how the controller dynamically selects the Green Light duration based on the combinations of Route 1 and Route 2 queue lengths. The smooth, non-linear terrain proves the fuzzy logic effectively handles complex edge-cases!
+### optimized 3d control surface
+this 3d surface shows the "brain" of the ai. it shows exactly how the controller picks the green light time based on how long the queues are on route 1 and route 2. the smooth, curvy terrain shows that fuzzy logic handles weird edge-cases way better than a dumb timer.
 
-![3D Control Surface](assets/images/control_surface.gif)
+![3d control surface](assets/images/control_surface.gif)
 
-### Queue Length Distribution (Violin Plot)
-While averages are helpful, this violin plot shows the entire *distribution* of queue lengths over the 1200 seconds. Notice how the Baseline model has a long "tail" (meaning massive traffic jams occasionally build up). The PSO and ACO models completely crush this tail, keeping the queue length consistently near zero!
+### queue length distribution (violin plot)
+averages are cool, but this violin plot shows the whole spread of queue lengths over the 1200 seconds. the baseline model has this long "tail" which basically means huge traffic jams happened randomly. but the pso and aco models completely killed that tail, keeping the queues near zero most of the time!
 
-![Queue Violin Plot](assets/images/queue_violin.png)
+![queue violin plot](assets/images/queue_violin.png)
 
-### Optimization Convergence Profile
-This chart proves that our algorithms didn't just guess randomly. Over 50 generations, you can see the cost dropping smoothly as the swarms and colonies learned how to manage traffic better. The lack of "flat-lining" proves our permutation symmetry and MMAS fixes were highly successful!
+### optimization convergence profile
+this chart proves the algorithms weren't just making lucky guesses. over 50 generations, you can see the cost dropping smoothly as the swarms and colonies figured out how to handle traffic better. since it doesn't just flatline early, it proves that our permutation symmetry fix actually worked!
 
-![Convergence Profiles](assets/images/convergence.png)
+![convergence profiles](assets/images/convergence.png)
 
-### Fuzzy Membership Boundary Evolutions
-This shows how the AI changed our human definitions of "Low", "Medium", and "High" queues to perfectly fit the traffic mathematically. 
+### fuzzy membership boundary evolutions
+this just shows how the ai took our human definitions of "low", "medium", and "high" queues and tweaked them to perfectly match the math of the traffic. 
 
-![Fuzzy Membership Boundaries](assets/images/fuzzy_boundaries.png)
+![fuzzy membership boundaries](assets/images/fuzzy_boundaries.png)
 
-### Intersection Queue State Rollouts
-This is a second-by-second playback of the queue lengths on the intersection. The shaded blue and red regions show when the green light was given to each route. Notice how the optimized controllers keep the queue peaks much lower than the baseline!
+### intersection queue state rollouts
+this is a second-by-second playback of the queue lengths. the blue and red shaded parts are when the green light was on for that route. notice how the optimized ones keep the spikes way lower than the baseline!
 
-![Simulation Rollouts](assets/images/simulation_rollout.png)
+![simulation rollouts](assets/images/simulation_rollout.png)

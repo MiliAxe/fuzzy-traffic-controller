@@ -1,32 +1,32 @@
-# Optimization Algorithms
+# optimization algorithms
 
-To make our Fuzzy Logic Controller as efficient as possible, we need to tune 15 internal parameters. These parameters represent the shapes of the fuzzy boundaries and the importance weights of the rules.
+to make the fuzzy logic controller run perfectly, we had to tweak 15 different internal parameters. these numbers decide the shapes of the fuzzy boundaries and how important each rule is.
 
-We tested two different **Population-Based Metaheuristic** algorithms. These algorithms are inspired by nature and involve a "population" of agents working together to find the best possible configuration.
+i ended up testing two different population-based metaheuristic algorithms. they sound fancy, but they're basically inspired by nature and use a "population" of agents working together to find the best setup.
 
-## 1. Particle Swarm Optimization (PSO)
-Inspired by a flock of birds, PSO creates a swarm of 30 "particles." Each particle represents a guessed configuration of the traffic light.
+## 1. particle swarm optimization (pso)
+this one is inspired by a flock of birds. pso makes a swarm of 30 "particles." each particle is basically a guess for how the traffic light should be set up.
 
-* The particles fly through the mathematical search space.
-* They remember their own personal best configuration.
-* They communicate with the swarm to know the global best configuration.
-* Over 50 generations, they adjust their flight paths, homing in on the absolute perfect traffic light parameters.
+* the particles fly around trying out different math combinations.
+* they remember their own personal best score.
+* they also talk to the rest of the swarm to see the global best score.
+* over 50 rounds (generations), they tweak their flight paths until they hone in on the absolute perfect setup.
 
-## 2. Ant Colony Optimization (ACO)
-Inspired by how ants find the shortest path to food, ACO uses 30 "ants" to build configurations step-by-step.
+## 2. ant colony optimization (aco)
+this one is inspired by how ants find the shortest path to food. aco uses 30 "ants" to build the setup step-by-step.
 
-* We divide the search space into a grid (30 bins per parameter).
-* When an ant finds a good configuration (low traffic cost), it deposits "pheromones" on those grid bins.
-* Future ants are probabilistically attracted to bins with high pheromones.
-* Over time, bad paths evaporate, and the entire colony converges on the optimal configuration.
+* i chopped up the search space into a grid (30 bins for each parameter).
+* when an ant finds a good setup (meaning less traffic), it leaves "pheromones" on those bins.
+* the next ants are more likely to pick bins with lots of pheromones.
+* over time, the bad choices evaporate, and the whole colony agrees on the best setup.
 
 ---
 
-## Technical Innovation: Breaking the Permutation Symmetry
-During our research, we found a mathematical challenge: the fuzzy parameters have *permutation symmetry* (e.g., swapping the boundaries for "Low" and "Medium" evaluates exactly the same). If left unchecked, this confuses the ants and birds, causing them to deposit contradictory pheromones or collapse their search! 
+## a cool technical fix we did: breaking permutation symmetry
+while messing around with this, i ran into a weird math problem: the fuzzy parameters have permutation symmetry. this means swapping the boundaries for "low" and "medium" gives the exact same result. if you just leave it like that, it totally confuses the ants and birds! they end up leaving conflicting pheromones or just getting stuck.
 
-We fixed this by mathematically forcing all coordinates into a sorted wedge ($x_0 \le x_1 \le x_2$). This simple but powerful fix unlocked incredibly fast, robust, and smooth convergence for both algorithms, completely eliminating premature stagnation.
+we fixed this by forcing the math coordinates into a sorted wedge ($x_0 \le x_1 \le x_2$). it's a pretty simple fix but it made both algorithms run way faster and smoother, and completely stopped them from getting stuck early on.
 
-**Watch the AI learn!** Below is a real-time animation of the PSO swarm over 20 generations. Notice how the particles (blue dots) rapidly confine themselves to the valid sorted region (the red wedge) and beautifully converge on the optimal solution.
+**watch the ai learn!** here's an animation of the pso swarm over 20 generations. you can see the particles (blue dots) quickly trapping themselves in the valid sorted area (the red wedge) and converging on the best answer.
 
-![Swarm Convergence](assets/images/swarm_convergence.gif)
+![swarm convergence](assets/images/swarm_convergence.gif)

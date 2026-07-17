@@ -1,47 +1,47 @@
-# How It Works (Fuzzy Logic)
+# how it works (fuzzy logic)
 
-Our traffic controller doesn't just use simple IF/ELSE statements. It uses **Fuzzy Logic**, which allows it to mathematically handle real-world uncertainty perfectly.
+so our traffic controller doesn't just use basic if/else statements. we used fuzzy logic, which is cooler because it handles real-world uncertainty a lot better.
 
-## The Goal
-The intersection has two main routes. The goal is to minimize a combination of three things:
+## what we want to do
+the intersection has two main roads. the whole point of this is to minimize three things:
 
-1. **Average Wait Time ($W$)**
-2. **Average Queue Length ($Q$)**
-3. **Number of Vehicle Stops ($S$)**
+1. average wait time ($w$)
+2. average queue length ($q$)
+3. number of times cars have to stop ($s$)
 
-We combine these into a single "Cost" score: $Cost = 0.5W + 0.3Q + 0.2S$. The lower the cost, the better the traffic flows!
+i just combined these into one "cost" score: $cost = 0.5w + 0.3q + 0.2s$. basically, lower cost means the traffic is flowing better!
 
-## What is Fuzzy Logic?
-Normally, a queue is just an exact number (like 12 cars). In Fuzzy Logic, we convert this exact number into "linguistic terms" just like a human would.
-For example, 12 cars might be 80% "High" and 20% "Medium". 
+## so what is fuzzy logic?
+normally, a queue is just a hard number (like 12 cars). but in fuzzy logic, we turn this number into words, kind of like how a real person would describe it.
+so instead of "12 cars", we might say it's 80% "high" and 20% "medium". 
 
-Our system does this in three steps:
+we do this in three main steps:
 
-### 1. Fuzzification
-We look at the queue length on Route 1 and Route 2, and categorize them into **Low**, **Medium**, or **High** based on geometric boundaries (triangles and trapezoids).
+### 1. fuzzification
+first, we check the queue length on route 1 and route 2, and sort them into low, medium, or high using some math shapes (triangles and trapezoids).
 
-### 2. Rule Evaluation
-We apply 9 common-sense rules to make a decision. For example:
-* *IF Route 1 has a High queue AND Route 2 has a Low queue, THEN give Route 1 a Long green light.*
-* *IF both routes have a Medium queue, THEN give them a Medium green light.*
+### 2. rule evaluation
+then we use 9 simple rules to figure out what to do. for example:
+* if route 1 has a high queue and route 2 has a low queue, then give route 1 a long green light.
+* if both roads have a medium queue, then give them a medium green light.
 
-### 3. Defuzzification
-The rules output a "fuzzy" green light recommendation (e.g., "mostly Long, slightly Medium"). We use mathematical integration (the Center of Gravity method) to convert this back into an exact number of seconds (e.g., 42 seconds) to keep the green light on.
+### 3. defuzzification
+the rules spit out a "fuzzy" green light idea (like, "mostly long, but a bit medium"). we use some math integration (the center of gravity method) to turn this back into an actual number of seconds, like 42 seconds, for the green light.
 
-## System Architecture Loop
-The controller evaluates the intersection continuously in a tight feedback loop:
+## how the system loops
+the controller is constantly checking the intersection in a loop:
 
 ```mermaid
 graph TD
-    A[Vehicle Arrivals] --> B[Intersection Queue State]
-    B --> C{Fuzzy Logic Controller}
-    C -->|Fuzzification| D[Calculate Linguistic Terms]
-    D -->|Inference| E[Evaluate 9 Rules]
-    E -->|Defuzzification| F[Output Green Time]
-    F --> G[Traffic Light Execution]
+    A[cars arrive] --> B[check intersection queue]
+    B --> C{fuzzy logic controller}
+    C -->|fuzzification| D[figure out low/med/high]
+    D -->|inference| E[run the 9 rules]
+    E -->|defuzzification| F[spit out green time]
+    F --> G[change traffic light]
     G --> B
 ```
 
-## Why Optimization?
-The definitions of "Low", "Medium", and "High" are determined by those geometric boundaries. But what exactly counts as a "High" queue? 10 cars? 20 cars? 
-If we guess these boundaries manually, the system won't be perfect. Instead, we use **AI Optimization Algorithms** to find the absolute mathematically perfect boundaries!
+## why do we need optimization?
+the thing is, what actually counts as a "high" queue? is it 10 cars? 20 cars? we define these using the shapes from earlier.
+if we just guess the boundaries ourselves, it's not going to be perfect. so instead, i used ai optimization algorithms to figure out the exact mathematical best boundaries for us.

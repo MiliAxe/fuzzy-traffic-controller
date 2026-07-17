@@ -1,15 +1,15 @@
-# Code Reference
+# code reference
 
-This section provides automatic documentation for the Python classes that power the ATLC simulation and optimization pipelines.
+here's some auto-generated docs for the python classes that run the atlc simulation and optimization stuff. it pulled this right from the code.
 
-## Fuzzy Controller
+## fuzzy controller
 ::: fuzzy_controller.FuzzyController
 
-## Simulation Engine
+## simulation engine
 ::: simulation.TrafficSimulation
 
-## PSO Optimizer
+## pso optimizer
 ::: pso_optimizer.PSOOptimizer
 
-## ACO Optimizer
+## aco optimizer
 ::: aco_optimizer.ACOOptimizer

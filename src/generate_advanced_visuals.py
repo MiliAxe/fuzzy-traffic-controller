@@ -10,11 +10,6 @@ import os
 
 os.makedirs("docs/assets/images", exist_ok=True)
 
-# 1. Rotating 3D Control Surface (GIF)
-print("Generating 3D Control Surface Animation...")
-
-# Use the Baseline (Human-Designed) Controller for a beautiful, smooth surface
-# The AI-optimized surface is highly degenerate/flat due to aggressive traffic-clearing hacks.
 controller = FuzzyController()
 
 q1_range = np.linspace(0, 30, 30)
@@ -41,8 +36,6 @@ rot_animation = animation.FuncAnimation(fig, rotate, frames=np.arange(0, 360, 10
 rot_animation.save('docs/assets/images/control_surface.gif', dpi=80, writer='pillow')
 plt.close(fig)
 
-# 2. Swarm Trajectory Convergence (GIF)
-print("Generating Swarm Trajectory Animation...")
 sim = TrafficSimulation(sim_duration=300)
 def cost_fn(x):
     ctrl = FuzzyController()
@@ -78,8 +71,6 @@ swarm_anim = animation.FuncAnimation(fig2, update_swarm, frames=len(history), in
 swarm_anim.save('docs/assets/images/swarm_convergence.gif', dpi=80, writer='pillow')
 plt.close(fig2)
 
-# 3. Wait Time / Queue Violin Plot
-print("Generating Queue Violin Plot...")
 sim_full = TrafficSimulation(sim_duration=1200)
 baseline_ctrl = FuzzyController()
 _, baseline_metrics = sim_full.run(baseline_ctrl, seed=4751)
@@ -116,5 +107,3 @@ ax3.set_ylabel('Total Intersection Queue Length (Vehicles)')
 ax3.set_title('Distribution of Queue Lengths over 1200s (Seed 4751)')
 plt.savefig('docs/assets/images/queue_violin.png', dpi=150, bbox_inches='tight')
 plt.close(fig3)
-
-print("All advanced visuals generated successfully!")
