@@ -2,7 +2,7 @@ import numpy as np
 
 class TrafficSimulation:
     def __init__(self, lambda1=0.12, lambda2=0.08, discharge_rate=0.5, yellow_time=3,
-                 G_min=5, G_max=60, sim_duration=1200, alpha=0.5, beta=0.3, gamma=0.2):
+                 G_min=5, G_max=60, sim_duration=1200, alpha=0.5, beta=0.3, gamma=0.001):
         """
         Discrete-time Traffic Simulation for a 2-route intersection.
         
