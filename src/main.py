@@ -34,7 +34,6 @@ def sim_baseline(duration, seed):
     """Runs a baseline simulation with the default fuzzy logic controller parameters."""
     click.echo("Running baseline simulation with default hand-tuned fuzzy controller...")
     
-    # Use default constructor (uses pre-configured fuzzy sets & rules)
     controller = FuzzyController()
     sim = TrafficSimulation(sim_duration=duration)
     cost, metrics = sim.run(controller, seed=seed)
@@ -44,7 +43,8 @@ def sim_baseline(duration, seed):
     click.echo(f"Total Vehicles      : {metrics['total_vehicles']}")
     click.echo(f"Avg Wait Time (W)   : {metrics['avg_wait']:.4f} seconds")
     click.echo(f"Avg Queue Length (Q): {metrics['avg_queue']:.4f} vehicles")
-    click.echo(f"Avg Stops per Veh(S): {metrics['avg_stops']:.4f}")
+    click.echo(f"Vehicle Stops (S)   : {metrics['stop_count']} stops "
+               f"({metrics['avg_stops']*100:.2f}% of vehicles)")
     click.echo(f"Total Evaluated Cost: {cost:.4f}")
 
 @cli.command('optimize-pso')
@@ -151,7 +151,9 @@ def optimize_aco(ants, iterations, bins, duration, seed):
 @cli.command('compare')
 @click.option('--duration', default=1200, help='Simulation duration in seconds.')
 @click.option('--seed', default=42, help='Random test seed.')
-def compare(duration, seed):
+@click.option('--stability-seeds', default='42,7,123,2024,99',
+              help='Comma-separated seeds for run-to-run stability evaluation.')
+def compare(duration, seed, stability_seeds):
     """Compares Baseline vs. PSO vs. ACO and outputs performance tables and charts."""
     click.echo(f"Loading optimization parameters and running comparative evaluation on seed {seed}...")
     
@@ -175,6 +177,8 @@ def compare(duration, seed):
             data = json.load(f)
             aco_params = np.array(data['params'])
             aco_conv = data['convergence']
+
+    stability_seeds = [int(s.strip()) for s in stability_seeds.split(',')]
             
     # Setup controllers
     ctrl_base = FuzzyController()
@@ -191,7 +195,7 @@ def compare(duration, seed):
     # Format and print the comparison matrix
     headers = ["Metric", "Baseline (Initial)", "PSO Optimized", "ACO Optimized", "PSO Imp.", "ACO Imp."]
     
-    def get_row(name, val_b, val_p, val_a, is_pct=False):
+    def get_row(name, val_b, val_p, val_a, is_pct=False, is_count=False):
         imp_p = (val_b - val_p) / val_b * 100.0 if val_b > 0.0 else 0.0
         imp_a = (val_b - val_a) / val_b * 100.0 if val_b > 0.0 else 0.0
         
@@ -200,13 +204,16 @@ def compare(duration, seed):
         
         if is_pct:
             return [name, f"{val_b * 100.0:.2f}%", f"{val_p * 100.0:.2f}%", f"{val_a * 100.0:.2f}%", f"{sign_p}{imp_p:.1f}%", f"{sign_a}{imp_a:.1f}%"]
+        elif is_count:
+            return [name, f"{val_b:.0f}", f"{val_p:.0f}", f"{val_a:.0f}", f"{sign_p}{imp_p:.1f}%", f"{sign_a}{imp_a:.1f}%"]
         else:
             return [name, f"{val_b:.4f}", f"{val_p:.4f}", f"{val_a:.4f}", f"{sign_p}{imp_p:.1f}%", f"{sign_a}{imp_a:.1f}%"]
             
     rows = [
         get_row("Avg Wait W (s)", metrics_base['avg_wait'], metrics_pso['avg_wait'], metrics_aco['avg_wait']),
         get_row("Avg Queue Q", metrics_base['avg_queue'], metrics_pso['avg_queue'], metrics_aco['avg_queue']),
-        get_row("Avg Stops S", metrics_base['avg_stops'], metrics_pso['avg_stops'], metrics_aco['avg_stops'], is_pct=True),
+        get_row("Vehicle Stops S (count)", metrics_base['stop_count'], metrics_pso['stop_count'], metrics_aco['stop_count'], is_count=True),
+        get_row("Stop Rate (informational)", metrics_base['avg_stops'], metrics_pso['avg_stops'], metrics_aco['avg_stops'], is_pct=True),
         get_row("Evaluation Cost C", cost_base, cost_pso, cost_aco)
     ]
     
@@ -221,6 +228,30 @@ def compare(duration, seed):
         click.echo("| " + " | ".join(f"{item:<{col_widths[i]}}" for i, item in enumerate(row)) + " |")
     click.echo(sep)
     click.echo("="*97)
+
+    # ─── STABILITY ACROSS RUNS ───
+    stability_seeds = [42, 7, 123, 2024, 99]
+    click.echo(f"\nEvaluating stability across {len(stability_seeds)} seeds: {stability_seeds}")
+
+    stability_costs = {'Baseline': [], 'PSO': [], 'ACO': []}
+    for s in stability_seeds:
+        cb, _ = sim.run(ctrl_base, seed=s)
+        cp, _ = sim.run(ctrl_pso, seed=s)
+        ca, _ = sim.run(ctrl_aco, seed=s)
+        stability_costs['Baseline'].append(cb)
+        stability_costs['PSO'].append(cp)
+        stability_costs['ACO'].append(ca)
+
+    click.echo("\n" + "="*30 + " STABILITY ACROSS RUNS " + "="*30)
+    click.echo(f"{'Controller':<12} | {'Mean Cost':>10} | {'Std Dev':>10} | {'CV (Std/Mean)':>14}")
+    click.echo("-"*55)
+    for name, costs in stability_costs.items():
+        costs = np.array(costs)
+        mean_c = costs.mean()
+        std_c = costs.std()
+        cv = std_c / mean_c if mean_c > 0 else 0.0
+        click.echo(f"{name:<12} | {mean_c:>10.4f} | {std_c:>10.4f} | {cv:>14.4f}")
+    click.echo("="*86)
     
     # ─── CHART GENERATION ───
     ensure_directories()
