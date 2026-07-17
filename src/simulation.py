@@ -2,7 +2,7 @@ import numpy as np
 
 class TrafficSimulation:
     def __init__(self, lambda1=0.12, lambda2=0.08, discharge_rate=0.5, yellow_time=3,
-                 G_min=5, G_max=60, sim_duration=1200, alpha=0.5, beta=0.3, gamma=0.2):
+                 G_min=5, G_max=60, sim_duration=1200, alpha=0.5, beta=0.3, gamma=0.001):
         """
         Discrete-time Traffic Simulation for a 2-route intersection.
         
@@ -236,7 +236,7 @@ class TrafficSimulation:
         # Post-simulation metric calculations
         wait_times = []
         stops_count = 0
-        
+
         for veh in all_vehicles:
             t_arr = veh['t_arr']
             t_dep = veh['t_dep']
@@ -245,32 +245,34 @@ class TrafficSimulation:
             else:
                 # If vehicle is still in queue at the end of the simulation
                 w = float(self.sim_duration - t_arr)
-                
+
             wait_times.append(w)
-            
+
             # A vehicle stops if it has to wait in a queue for at least 1 second
             if w > 0.0:
                 stops_count += 1
-                
+
         num_vehicles = len(all_vehicles)
         avg_w = np.mean(wait_times) if num_vehicles > 0 else 0.0
-        avg_s = (stops_count / num_vehicles) if num_vehicles > 0 else 0.0
-        
-        # Average queue length is the average of sum(q1_len + q2_len) / 2 over all seconds
+
+        stop_count = stops_count
+        avg_stops_rate = (stops_count / num_vehicles) if num_vehicles > 0 else 0.0
+
         if len(history['time']) > 0:
             avg_q = np.mean(np.array(history['q1_len']) + np.array(history['q2_len'])) / 2.0
         else:
             avg_q = 0.0
-            
-        # Multi-objective Cost Function
-        cost = self.alpha * avg_w + self.beta * avg_q + self.gamma * avg_s
-        
+
+        # Cost function per doc eq (1): C = alpha*W + beta*Q + gamma*S
+        cost = self.alpha * avg_w + self.beta * avg_q + self.gamma * stop_count
+
         metrics = {
             'avg_wait': avg_w,
             'avg_queue': avg_q,
-            'avg_stops': avg_s,
+            'avg_stops': avg_stops_rate,
+            'stop_count': stop_count,
             'total_vehicles': num_vehicles,
             'history': history
         }
-        
+
         return cost, metrics
