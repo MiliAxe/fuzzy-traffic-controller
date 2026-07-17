@@ -151,7 +151,9 @@ def optimize_aco(ants, iterations, bins, duration, seed):
 @cli.command('compare')
 @click.option('--duration', default=1200, help='Simulation duration in seconds.')
 @click.option('--seed', default=42, help='Random test seed.')
-def compare(duration, seed):
+@click.option('--stability-seeds', default='42,7,123,2024,99',
+              help='Comma-separated seeds for run-to-run stability evaluation.')
+def compare(duration, seed, stability_seeds):
     """Compares Baseline vs. PSO vs. ACO and outputs performance tables and charts."""
     click.echo(f"Loading optimization parameters and running comparative evaluation on seed {seed}...")
     
@@ -175,6 +177,8 @@ def compare(duration, seed):
             data = json.load(f)
             aco_params = np.array(data['params'])
             aco_conv = data['convergence']
+
+    stability_seeds = [int(s.strip()) for s in stability_seeds.split(',')]
             
     # Setup controllers
     ctrl_base = FuzzyController()
@@ -224,6 +228,30 @@ def compare(duration, seed):
         click.echo("| " + " | ".join(f"{item:<{col_widths[i]}}" for i, item in enumerate(row)) + " |")
     click.echo(sep)
     click.echo("="*97)
+
+    # ─── STABILITY ACROSS RUNS ───
+    stability_seeds = [42, 7, 123, 2024, 99]
+    click.echo(f"\nEvaluating stability across {len(stability_seeds)} seeds: {stability_seeds}")
+
+    stability_costs = {'Baseline': [], 'PSO': [], 'ACO': []}
+    for s in stability_seeds:
+        cb, _ = sim.run(ctrl_base, seed=s)
+        cp, _ = sim.run(ctrl_pso, seed=s)
+        ca, _ = sim.run(ctrl_aco, seed=s)
+        stability_costs['Baseline'].append(cb)
+        stability_costs['PSO'].append(cp)
+        stability_costs['ACO'].append(ca)
+
+    click.echo("\n" + "="*30 + " STABILITY ACROSS RUNS " + "="*30)
+    click.echo(f"{'Controller':<12} | {'Mean Cost':>10} | {'Std Dev':>10} | {'CV (Std/Mean)':>14}")
+    click.echo("-"*55)
+    for name, costs in stability_costs.items():
+        costs = np.array(costs)
+        mean_c = costs.mean()
+        std_c = costs.std()
+        cv = std_c / mean_c if mean_c > 0 else 0.0
+        click.echo(f"{name:<12} | {mean_c:>10.4f} | {std_c:>10.4f} | {cv:>14.4f}")
+    click.echo("="*86)
     
     # ─── CHART GENERATION ───
     ensure_directories()
